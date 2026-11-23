@@ -21,38 +21,60 @@ const MODEL_ROW = {
   label: 'Model',
   kind: 'choice',
   value: 'opus',
-  options: ['default', 'sonnet', 'opus', 'haiku', 'sonnet[1m]'],
+  options: ['default', 'sonnet', 'opus', 'haiku', 'fable', 'best', 'sonnet[1m]', 'opus[1m]', 'opusplan'],
   provider: { plugin: 'engine', tier: 'core' },
   isLocked: false,
 } as const
 
 for (const surface of ['terminal', 'desktop'] as const) {
-  test(`lista los modelos de /config y cambia con /model (${surface})`, async ($, on) => {
-    const runs: unknown[] = []
+  test(`plegado muestra solo el resumen y se despliega (${surface})`, async ($, on) => {
     on('config.list', () => ({ value: [MODEL_ROW] }))
-    on('command.run', (_, e) => {
-      runs.push({ command: e.command, args: e.args })
-
-      return { text: 'Set model' }
-    })
 
     const ui = await $.ui.mount({ ...BAND(), surface })
 
-    expect((await ui.find({ key: 'sonnet[1m]' }))?.text).toMatch(/Sonnet 1M/)
-    await ui.press({ key: 'haiku' })
-    expect(runs).toEqual([{ command: 'model', args: 'haiku' }])
+    expect((await ui.find({ key: 'toggle' }))?.text).toMatch(/Opus · Auto · Fast off/)
+    expect(await ui.find({ key: 'sonnet' })).toBeUndefined()
+
+    await ui.press({ key: 'toggle' })
+    for (const key of ['opus', 'sonnet', 'haiku', 'fable', '1m', 'effort-medium', 'fast']) {
+      expect(await ui.find({ key })).toBeDefined()
+    }
+    for (const key of ['default', 'best', 'opusplan', 'sonnet[1m]']) {
+      expect(await ui.find({ key })).toBeUndefined()
+    }
+
+    await ui.press({ key: 'toggle' })
+    expect(await ui.find({ key: 'sonnet' })).toBeUndefined()
     await ui.unmount()
   })
 }
 
-test('usa la lista fija si /config no trae opciones', async ($, on) => {
-  on('config.list', () => ({ value: [] }))
+test('cambia modelo, 1M, effort y fast con sus comandos', async ($, on) => {
+  const runs: unknown[] = []
+  on('config.list', () => ({ value: [MODEL_ROW] }))
+  on('command.run', (_, e) => {
+    runs.push({ command: e.command, args: e.args })
+
+    return { text: 'ok' }
+  })
 
   const ui = await $.ui.mount({ ...BAND(), surface: 'terminal' })
+  await ui.press({ key: 'toggle' })
+  await ui.press({ key: '1m' })
+  await ui.press({ key: 'sonnet' })
+  await ui.press({ key: 'haiku' })
+  await ui.press({ key: 'effort-high' })
+  await ui.press({ key: 'fast' })
 
-  for (const key of ['opus', 'sonnet', 'haiku', 'fable']) {
-    expect(await ui.find({ key })).toBeDefined()
-  }
+  expect(runs).toEqual([
+    { command: 'model', args: 'opus[1m]' },
+    { command: 'model', args: 'sonnet[1m]' },
+    { command: 'model', args: 'haiku' },
+    { command: 'effort', args: 'high' },
+    { command: 'fast', args: 'on' },
+  ])
+  expect((await ui.find({ key: 'toggle' }))?.text).toMatch(/Haiku · High · Fast on/)
+  expect(await ui.find({ key: '1m' })).toBeUndefined()
   await ui.unmount()
 })
 
@@ -66,18 +88,18 @@ test('cede la band a una encuesta', async ($, on) => {
 
   const ui = await $.ui.mount({ ...BAND({ hasSurvey: true }), surface: 'terminal' })
 
-  expect(await ui.find({ key: 'opus' })).toBeUndefined()
+  expect(await ui.find({ key: 'toggle' })).toBeUndefined()
   expect((await ui.find({ type: 'Text', text: /engine/ }))?.text).toBe('engine')
   await ui.unmount()
 })
 
-test('sin botones mientras Claude trabaja', async ($, on) => {
+test('mientras Claude trabaja solo se ve el resumen', async ($, on) => {
   on('config.list', () => ({ value: [MODEL_ROW] }))
 
   const ui = await $.ui.mount({ ...BAND({ isWorking: true }), surface: 'terminal' })
 
-  expect(await ui.find({ key: 'sonnet' })).toBeUndefined()
-  expect((await ui.find({ type: 'Text', text: /Modelo: Opus/ }))?.text).toBeDefined()
+  expect(await ui.find({ key: 'toggle' })).toBeUndefined()
+  expect((await ui.find({ type: 'Text', text: /Opus · Auto · Fast off/ }))?.text).toBeDefined()
   await ui.unmount()
 })
 
@@ -94,6 +116,7 @@ test('un fallo de /model se avisa con un toast', async ($, on) => {
   })
 
   const ui = await $.ui.mount({ ...BAND(), surface: 'terminal' })
+  await ui.press({ key: 'toggle' })
   await ui.press({ key: 'sonnet' })
 
   expect(toasts[0]).toMatch(/No se pudo cambiar a Sonnet/)

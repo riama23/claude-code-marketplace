@@ -5,7 +5,7 @@
     {
       "name": "model-switcher",
       "source": "./plugins/model-switcher",
-      "description": "Mod: selector de modelo encima del input para cambiar de modelo en la sesión actual."
+      "description": "Mod: panel encima del input para cambiar modelo, effort y fast mode en la sesión actual."
     }
   ]
 }
