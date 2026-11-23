@@ -1,0 +1,27 @@
+{
+  "name": "markdown-toolbar",
+  "version": "0.3.0",
+  "description": "Barra y atajos para dar formato markdown al input del chat, con resaltado y vista previa en vivo.",
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "previewMode": {
+      "type": "string",
+      "title": "Vista previa: dónde se muestra",
+      "description": "band: debajo de los botones, encima del prompt. pane: en un panel lateral.",
+      "options": ["band", "pane"],
+      "default": "band"
+    },
+    "previewShortcut": {
+      "type": "string",
+      "title": "Atajo de la vista previa",
+      "description": "Atajo de ~/.claude/keybindings.json que muestra u oculta la vista previa (p. ej. ctrl+shift+p). Vacío: sin atajo.",
+      "default": "ctrl+shift+p"
+    },
+    "formatShortcut": {
+      "type": "string",
+      "title": "Atajo del modo formato",
+      "description": "Atajo de ~/.claude/keybindings.json que activa el modo formato (p. ej. meta+e). Vacío: sin atajo.",
+      "default": "meta+e"
+    }
+  }
+}

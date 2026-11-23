@@ -6,6 +6,11 @@
       "name": "model-switcher",
       "source": "./plugins/model-switcher",
       "description": "Mod: panel encima del input para cambiar modelo, effort y fast mode en la sesión actual."
+    },
+    {
+      "name": "markdown-toolbar",
+      "source": "./plugins/markdown-toolbar",
+      "description": "Mod: barra y atajos para dar formato markdown al input del chat, con resaltado y vista previa en vivo."
     }
   ]
 }
