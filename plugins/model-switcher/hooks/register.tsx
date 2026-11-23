@@ -109,11 +109,15 @@ export const register: Register = on => {
       )
     }
 
+    // Sin hotkey: un dígito suelto competía con lo que se escribe en el prompt.
+    // Un mod no puede declarar acciones propias, así que se usa app:cycleDiffBase
+    // (su handler solo existe dentro del panel de diff); la persona le asigna el
+    // atajo en ~/.claude/keybindings.json, p. ej. "cmd+m" en el contexto Global.
     const toggle = (
       <Button
         key="toggle"
         label={`${summary} ${open ? '▾' : '▸'}`}
-        hotkey="0"
+        action="app:cycleDiffBase"
         plain
         dimColor={!open}
         onPress={() => update($, isOpen, v => !v)}

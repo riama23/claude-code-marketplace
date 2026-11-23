@@ -32,7 +32,11 @@ for (const surface of ['terminal', 'desktop'] as const) {
 
     const ui = await $.ui.mount({ ...BAND(), surface })
 
-    expect((await ui.find({ key: 'toggle' }))?.text).toMatch(/Opus · Auto · Fast off/)
+    const toggle = await ui.find({ key: 'toggle' })
+    expect(toggle?.text).toMatch(/Opus · Auto · Fast off/)
+    // Se despliega con el atajo de la acción (Cmd+M en keybindings.json), no con un dígito.
+    expect(toggle?.props.action).toBe('app:cycleDiffBase')
+    expect(toggle?.props.hotkey).toBeUndefined()
     expect(await ui.find({ key: 'sonnet' })).toBeUndefined()
 
     await ui.press({ key: 'toggle' })
