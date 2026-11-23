@@ -1,0 +1,11 @@
+{
+  "name": "claude-code-marketplace",
+  "owner": { "name": "Enrique de Ridder" },
+  "plugins": [
+    {
+      "name": "model-switcher",
+      "source": "./plugins/model-switcher",
+      "description": "Mod: selector de modelo encima del input para cambiar de modelo en la sesión actual."
+    }
+  ]
+}

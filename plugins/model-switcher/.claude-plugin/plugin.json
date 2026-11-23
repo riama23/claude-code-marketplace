@@ -1,0 +1,6 @@
+{
+  "name": "model-switcher",
+  "version": "0.1.0",
+  "description": "Selector de modelo encima del input: un botón por modelo para cambiar de modelo en la sesión actual.",
+  "types": "./types/index.d.ts"
+}
